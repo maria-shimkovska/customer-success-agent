@@ -1,6 +1,6 @@
 # Customer Success Agent
 
-An AI-powered customer success agent built with [AgentSpan](https://agentspan.dev). Given a customer ID and issue description, the agent automatically investigates by pulling CRM and Slack data, then either opens a support ticket or escalates to a human — with a built-in human-in-the-loop approval step for escalations.
+An AI-powered customer success agent built with [Agentspan](https://agentspan.dev). Given a customer ID and issue description, the agent automatically investigates by pulling CRM and Slack data, then either opens a support ticket or escalates to a human — with a built-in human-in-the-loop approval step for escalations.
 
 ## What it does
 
