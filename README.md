@@ -2,7 +2,7 @@
 
 An AI agent that investigates customer issues end-to-end — pulling live CRM and Slack data, deciding on the right action, and handing off to a human when it matters. Built with [Agentspan](https://agentspan.ai).
 
-<video src="customer_success_agent.mp4" controls width="100%"></video>
+<video src="https://github.com/maria-shimkovska/customer-success-agent/releases/download/v1.0/customer_success_agent.mp4" controls width="100%"></video>
 
 ---
 
