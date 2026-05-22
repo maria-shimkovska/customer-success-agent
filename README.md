@@ -1,19 +1,37 @@
 # Customer Success Agent
 
-An AI-powered customer success agent built with [Agentspan](https://agentspan.dev). Given a customer ID and issue description, the agent automatically investigates by pulling CRM and Slack data, then either opens a support ticket or escalates to a human — with a built-in human-in-the-loop approval step for escalations.
+An AI agent that investigates customer issues end-to-end — pulling live CRM and Slack data, deciding on the right action, and handing off to a human when it matters. Built with [Agentspan](https://agentspan.dev).
 
-## What it does
+<video src="customer_success_agent.mp4" controls width="100%"></video>
 
-1. Fetches the customer's account details from HubSpot (tier, contract value, health score)
-2. Reads recent Slack channel history to understand the full context
-3. Decides to either open a Zendesk ticket or escalate to a human agent
-4. Requires human approval before escalating (interactive prompt in the terminal)
+---
+
+## How it works
+
+Drop in a customer ID and a problem description. The agent takes it from there:
+
+1. **Looks up the customer in HubSpot** — contract value, health score, lifecycle stage, account owner
+2. **Reads their Slack channel** — understands the full conversation history and urgency
+3. **Takes action** — opens a Zendesk ticket or escalates to a human, based on what it finds
+4. **Asks before escalating** — if it wants to loop in a human, it pauses and asks you first
+
+High-value customers (contracts over $25k) get prioritized automatically. Low-confidence situations trigger an escalation rather than a guess.
+
+---
+
+## Demo
+
+The agent works through a real scenario: a customer whose exports have been failing for 3 days with their CFO getting involved. Watch the video above to see it run live.
+
+---
 
 ## Requirements
 
 - Python 3.10+
 - An [Anthropic API key](https://console.anthropic.com/)
 - The `agentspan` package
+
+---
 
 ## Setup
 
@@ -39,27 +57,50 @@ An AI-powered customer success agent built with [Agentspan](https://agentspan.de
    export ANTHROPIC_API_KEY=your_api_key_here
    ```
 
-## Running the agent
+---
+
+## Run it
 
 ```bash
 python agent.py
 ```
 
-The agent will print each step as it works through the issue. If it decides to escalate, it will pause and prompt you for approval:
+You'll see each step printed as the agent works through the issue:
 
 ```
+============================================================
+  CUSTOMER SUCCESS AGENT
+  Investigating: Sekro — export failures (3 days, CFO involved)
+============================================================
+
+  STEP 1: Looking up customer in HubSpot
+  Company:        Sekro
+  Contract value: $48,000
+  Health score:   62
+
+  STEP 2: Reading Slack channel history
+  Channel: #sekro — 3 messages
+    bob@sekro.com: Hey, our exports have been failing since Tuesday
+    ...
+
+  STEP 3: Preparing to escalate to human
+
+============================================================
   HUMAN APPROVAL REQUIRED
+============================================================
+
   The agent has reviewed the customer data and is requesting
   permission to escalate this issue to a human agent.
 
   Approve? (y/n):
 ```
 
-- Press `y` to approve the escalation and let the agent continue
-- Press `n` to reject it — the agent will wrap up without escalating
+Press `y` to approve the escalation or `n` to reject it. That's it.
 
-## Customizing
+---
 
-The demo uses hardcoded mock data in the tool functions (`get_hubspot_data`, `get_slack_data`, `open_zendesk_ticket`). To connect real services, replace the return values in each tool with actual API calls to HubSpot, Slack, and Zendesk.
+## Customize it
 
-To change the customer scenario, update the prompt in the `runtime.start(...)` call at the bottom of `agent.py`.
+The tool functions (`get_hubspot_data`, `get_slack_data`, `open_zendesk_ticket`) return hardcoded mock data by default. To wire up real services, replace the `return` values with actual API calls.
+
+To change the scenario, update the prompt passed to `runtime.start(...)` at the bottom of `agent.py`.
