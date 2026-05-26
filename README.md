@@ -59,6 +59,14 @@ The agent works through a real scenario: a customer whose exports have been fail
 
 ---
 
+## Agentspan execution view
+
+When the agent runs, Agentspan records the full execution on the server. You can open the run and step through it to see what happened at each stage.
+
+![Agentspan execution view](screenshot-agentspan-execution.png)
+
+---
+
 ## Requirements
 
 - Python 3.10+
