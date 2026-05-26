@@ -47,7 +47,7 @@ If it decides the situation needs a human, it **pauses and asks you** before doi
 
 **Press `y`** — marks it as resolved. The agent continues running and prints a final summary when done.
 
-**Press `n`** — rejects the intervention. The agent wraps up and prints a summary of what happened.
+**Press `n`** — the issue is left unresolved. The agent prints a summary and stops.
 
 Either way, you always get a final summary at the end.
 
