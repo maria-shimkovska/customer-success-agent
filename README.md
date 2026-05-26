@@ -6,6 +6,16 @@ An AI agent that investigates customer issues end-to-end — pulling live CRM an
 
 ---
 
+## Why try this
+
+This project is a good example of what an AI agent actually looks like in practice. It is simple enough to understand quickly, but it demonstrates the core mechanics that make agents useful: the model reasons about a situation, calls real tools to fetch data, and makes decisions based on what it finds.
+
+When you run it, you can watch that process happen in the terminal. You see the data it pulls, the steps it takes, and if it decides the situation needs a human, it pauses and asks you directly. That human-in-the-loop checkpoint is one of the more interesting parts to see in action.
+
+It is not a polished product or a production-ready feature, it is a demo, but it shows the idea well. It shows how fast you can go from an idea to something that actually works, and the use case itself, helping a customer success team triage and respond to at-risk accounts, is the kind of real business problem that AI agents are genuinely well suited to solve.
+
+---
+
 ## What it does
 
 Give it a customer ID and a description of the problem. It works through the issue step by step:
