@@ -1,27 +1,51 @@
 # Customer Success Agent
 
-An AI agent that investigates customer issues end-to-end — pulling live CRM and Slack data, deciding on the right action, and handing off to a human when it matters. Built with [Agentspan](https://agentspan.ai).
+An AI agent that investigates customer issues end-to-end — pulling live CRM and Slack data, deciding on the right action, and looping in a human when it matters. Built with [Agentspan](https://agentspan.ai).
 
 <video src="https://github.com/user-attachments/assets/9796d98d-05e0-422e-8bb1-2ab12a390140" controls width="100%"></video>
 
 ---
 
-## How it works
+## What it does
 
-Drop in a customer ID and a problem description. The agent takes it from there:
+Give it a customer ID and a description of the problem. It works through the issue step by step:
 
 1. **Looks up the customer in HubSpot** — contract value, health score, lifecycle stage, account owner
 2. **Reads their Slack channel** — understands the full conversation history and urgency
-3. **Takes action** — opens a Zendesk ticket or escalates to a human, based on what it finds
-4. **Asks before escalating** — if it wants to loop in a human, it pauses and asks you first
+3. **Takes action** — either opens a Zendesk ticket or requests human intervention, based on what it found
 
-High-value customers (contracts over $25k) get prioritized automatically. Low-confidence situations trigger an escalation rather than a guess.
+High-value customers (contracts over $25k) get escalated automatically if the issue isn't resolved quickly. Low-confidence situations escalate rather than guess.
+
+---
+
+## What to expect when you run it
+
+The agent prints each step as it goes. Most of the time it runs fully on its own and ends with a summary.
+
+If it decides the situation needs a human, it **pauses and asks you** before doing anything:
+
+```
+============================================================
+  HUMAN APPROVAL REQUIRED
+============================================================
+
+  [Situation summary — who the customer is, what's wrong,
+   what the agent already did, and why it's escalating]
+
+  Mark as resolved? (y/n):
+```
+
+**Press `y`** — marks it as resolved. The agent continues running and prints a final summary when done.
+
+**Press `n`** — rejects the intervention. The agent wraps up and prints a summary of what happened.
+
+Either way, you always get a final summary at the end.
 
 ---
 
 ## Demo
 
-The agent works through a real scenario: a customer whose exports have been failing for 3 days with their CFO getting involved. Watch the video above to see it run live.
+The agent works through a real scenario: a customer whose exports have been failing for 3 days with their CFO now involved. Watch the video above to see it run live.
 
 ---
 
@@ -65,37 +89,11 @@ The agent works through a real scenario: a customer whose exports have been fail
 python agent.py
 ```
 
-You'll see each step printed as the agent works through the issue:
+You can also pass the issue directly as an argument:
 
+```bash
+python agent.py "Sekro — export failures, 3 days, CFO involved"
 ```
-============================================================
-  CUSTOMER SUCCESS AGENT
-  Investigating: Sekro — export failures (3 days, CFO involved)
-============================================================
-
-  STEP 1: Looking up customer in HubSpot
-  Company:        Sekro
-  Contract value: $48,000
-  Health score:   62
-
-  STEP 2: Reading Slack channel history
-  Channel: #sekro — 3 messages
-    bob@sekro.com: Hey, our exports have been failing since Tuesday
-    ...
-
-  STEP 3: Preparing to escalate to human
-
-============================================================
-  HUMAN APPROVAL REQUIRED
-============================================================
-
-  The agent has reviewed the customer data and is requesting
-  permission to escalate this issue to a human agent.
-
-  Approve? (y/n):
-```
-
-Press `y` to approve the escalation or `n` to reject it. That's it.
 
 ---
 
