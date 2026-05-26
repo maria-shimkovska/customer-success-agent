@@ -73,7 +73,7 @@ The agent works through a real scenario: a customer whose exports have been fail
 
 3. Install dependencies:
    ```bash
-   pip install agentspan
+   pip install agentspan anthropic
    ```
 
 4. Set your Anthropic API key:
