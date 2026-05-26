@@ -75,6 +75,8 @@ The agent works through a real scenario: a customer whose exports have been fail
    ```bash
    pip install agentspan anthropic
    ```
+   - `agentspan` — runs the agent, manages tool calls, and handles the human approval flow
+   - `anthropic` — used directly to call Claude for summarizing data and generating situation briefs
 
 4. Set your Anthropic API key:
    ```bash
