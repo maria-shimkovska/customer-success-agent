@@ -201,37 +201,50 @@ if __name__ == "__main__":
     import termios
 
     def read_char():
-      """Read a single keypress directly from the terminal."""
+      """Read a single keypress directly from the terminal.
+
+      We open /dev/tty directly instead of using input() because the agent's
+      stream is printing on a background thread at the same time. input() would
+      conflict with that output. Reading raw from /dev/tty lets us capture one
+      keypress cleanly without interfering with the stream.
+      """
       fd = os.open("/dev/tty", os.O_RDWR)
-      old = termios.tcgetattr(fd)
+      old = termios.tcgetattr(fd)  # save current terminal settings so we can restore them
       try:
-        tty_lib.setraw(fd)
-        termios.tcflush(fd, termios.TCIFLUSH)
-        ch = os.read(fd, 1).decode("utf-8", errors="replace")
+        tty_lib.setraw(fd)                                    # disable line buffering — don't wait for Enter
+        termios.tcflush(fd, termios.TCIFLUSH)                 # discard any buffered input before reading
+        ch = os.read(fd, 1).decode("utf-8", errors="replace") # read exactly one keypress
       finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old)
+        termios.tcsetattr(fd, termios.TCSADRAIN, old)  # restore original terminal settings
         os.close(fd)
       return ch
 
+    # Two events used to coordinate between the main thread and the stream thread:
+    # - pause_printing: set when we need the stream thread to stop printing (during approval prompt)
+    # - stream_done: set when the stream has finished, so the main thread knows to stop polling
     pause_printing = threading.Event()
     stream_done = threading.Event()
 
     def run_stream():
+      # Consume agent events on a background thread so the main thread stays free
+      # to poll for human approval at the same time.
       for event in handle.stream():
-        if not pause_printing.is_set():
+        if not pause_printing.is_set():  # skip printing while the approval prompt is shown
           handle_event(event)
-      stream_done.set()
+      stream_done.set()  # signal the main thread that the stream has ended
 
+    # Start the stream thread as a daemon so it exits automatically if the main thread exits
     t = threading.Thread(target=run_stream, daemon=True)
     t.start()
 
-    # Poll for human approval while stream runs in background
+    # Main thread polls every 2 seconds to check if the agent is waiting for human approval.
+    # This runs concurrently with the stream thread printing agent progress.
     while not stream_done.is_set():
       time.sleep(2)
       status = handle.get_status()
       if status.is_waiting:
-        pause_printing.set()
-        time.sleep(0.2)  # let stream thread finish its current print
+        pause_printing.set()           # tell the stream thread to stop printing
+        time.sleep(0.2)                # brief wait to let the stream thread finish its current print
         pt = status.pending_tool or {}
         args = pt.get("args") or pt  # args may be nested or flat
         if escalating:
@@ -252,7 +265,7 @@ if __name__ == "__main__":
         if answer == "y":
           handle.approve()
           print("\n  Marked as resolved.\n")
-          pause_printing.clear()
+          pause_printing.clear()  # resume the stream thread so it can print remaining events
         else:
           handle.reject("Intervention not approved")
           print("\n  Intervention rejected.\n")
@@ -268,4 +281,4 @@ if __name__ == "__main__":
             print("\n  Intervention was not approved. No further action was taken.\n")
         break
 
-    t.join(timeout=120)
+    t.join(timeout=120)  # wait for the stream thread to finish before exiting
