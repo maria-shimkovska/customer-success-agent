@@ -99,6 +99,37 @@ python agent.py "Sekro — export failures, 3 days, CFO involved"
 
 ---
 
+## Other inputs to try
+
+The mock data always returns the same Sekro account ($48k contract, health score 62, CFO involved). What changes is how the agent reasons about the situation based on your description.
+
+**Trigger an automatic Zendesk ticket** — describe a straightforward, low-urgency issue:
+```bash
+python agent.py "Sekro — user can't find the export button, first time asking"
+```
+
+**Trigger immediate human escalation** — mention high stakes or executive involvement:
+```bash
+python agent.py "Sekro — full data loss reported, legal team is involved"
+```
+
+**Test low-confidence handling** — give a vague or ambiguous description:
+```bash
+python agent.py "Sekro — something seems off with their account, not sure what"
+```
+
+**Simulate a billing dispute** — a different issue type to see how the agent adapts:
+```bash
+python agent.py "Sekro — disputing their last invoice, threatening to cancel"
+```
+
+**Try without a customer name** — see how the agent handles missing context:
+```bash
+python agent.py "exports broken for 3 days, CFO is angry"
+```
+
+---
+
 ## Customize it
 
 The tool functions (`get_hubspot_data`, `get_slack_data`, `open_zendesk_ticket`) return hardcoded mock data by default. To wire up real services, replace the `return` values with actual API calls.
