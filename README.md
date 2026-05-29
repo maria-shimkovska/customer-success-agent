@@ -72,6 +72,16 @@ When the agent runs, Agentspan records the full execution on the server. You can
 - Python 3.10+
 - An [Anthropic API key](https://console.anthropic.com/)
 - The `agentspan` package
+- Java 21+ (required by Agentspan — if missing, the agent will fail with a confusing Python traceback)
+
+  **Install on Ubuntu/Debian:**
+  ```bash
+  sudo apt install openjdk-21-jdk
+  ```
+  **Install on macOS:**
+  ```bash
+  brew install openjdk@21
+  ```
 
 ---
 
@@ -119,31 +129,41 @@ python agent.py "Sekro — export failures, 3 days, CFO involved"
 
 ## Other inputs to try
 
-The mock data always returns the same Sekro account ($48k contract, health score 62, CFO involved). What changes is how the agent reasons about the situation based on your description.
+Here are prompts that test different behaviors:
 
-**Trigger an automatic Zendesk ticket** — describe a straightforward, low-urgency issue:
+**By ID only**
 ```bash
-python agent.py "Sekro — user can't find the export button, first time asking"
+python agent.py "CUST-057 is having telemetry latency issues"
+python agent.py "CUST-004 feed delays are causing trading problems"
 ```
 
-**Trigger immediate human escalation** — mention high stakes or executive involvement:
+**By name only**
 ```bash
-python agent.py "Sekro — full data loss reported, legal team is involved"
+python agent.py "Stonebridge is sending wrong FX rates to their LPs"
+python agent.py "Rimrock had equipment fail silently with no alerts"
 ```
 
-**Test low-confidence handling** — give a vague or ambiguous description:
+**Vague — agent has to figure it out**
 ```bash
-python agent.py "Sekro — something seems off with their account, not sure what"
+python agent.py "a pharma company is about to miss an FDA deadline"
+python agent.py "one of our space customers has a mission window in 6 days and their telemetry is broken"
 ```
 
-**Simulate a billing dispute** — a different issue type to see how the agent adapts:
+**Should open a Zendesk ticket** (clear, actionable issue)
 ```bash
-python agent.py "Sekro — disputing their last invoice, threatening to cancel"
+python agent.py "CUST-005 found a bug where the quiz progress bar resets on refresh"
+python agent.py "Driftwood Coffee needs two new locations added to their portal"
 ```
 
-**Try without a customer name** — see how the agent handles missing context:
+**Should trigger intervention** (high-value + serious issue)
 ```bash
-python agent.py "exports broken for 3 days, CFO is angry"
+python agent.py "CUST-036 has gaps in their GxP audit trail and an FDA inspection next month"
+python agent.py "Orion Space Systems is about to invoke SLA penalties"
+```
+
+**Already has context in the prompt** — agent should skip unnecessary lookups
+```bash
+python agent.py "Fortis Capital, contract worth $210k, has had 30-second feed delays for two weeks and traders are using stale data"
 ```
 
 ---
